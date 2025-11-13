@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>服装搭配决策实验入口</title>
+  <style>
+    body {
+      font-family: "微软雅黑", sans-serif;
+      background: linear-gradient(135deg, #f8fbff, #e7eff9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      width: 750px;
+      padding: 40px 60px;
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+
+    h1 {
+      color: #1a3b7a;
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    .process-image {
+      width: 100%;
+      border-radius: 10px;
+      background: #f6faff;
+      padding: 15px;
+      box-sizing: border-box;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+    }
+
+    .consent-box {
+      text-align: left;
+      height: 160px;
+      overflow-y: auto;
+      border: 1px solid #dcdcdc;
+      border-radius: 10px;
+      padding: 15px 20px;
+      background: #fafafa;
+      margin-bottom: 25px;
+      line-height: 1.7;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .start-btn {
+      background: #2a6df4;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 50px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .start-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .start-btn:hover:not(:disabled) {
+      background: #1d4fcc;
+      transform: scale(1.05);
+    }
+
+    #message {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>服装搭配决策实验</h1>
+
+    <!-- 实验流程图 -->
+    <img src="图片1.png" alt="实验主要流程" class="process-image">
+
+    <p>请在开始实验前仔细阅读以下知情同意书：</p>
+
+    <div class="consent-box">
+      <p><strong>知情同意书</strong></p>
+      <p>您好！感谢您参与本研究。本实验旨在了解消费者在服装搭配情境下的决策行为。</p>
+      <p>实验内容包括浏览若干服装图片并进行选择，无任何风险和不适。</p>
+      <p>您的参与完全自愿，您可在任何时候退出实验。所有数据仅用于学术研究，将严格保密。</p>
+      <p>点击“我同意”即表示您已阅读并理解以上内容，愿意继续参与实验。</p>
+    </div>
+
+    <div class="checkbox">
+      <input type="checkbox" id="consentCheckbox">
+      <label for="consentCheckbox">我已阅读并同意知情同意书</label>
+    </div>
+
+    <button id="startButton" class="start-btn" disabled>开始实验</button>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const urls = [
+      "https://v.wjx.cn/vm/mQGgNyO.aspx",
+      "https://v.wjx.cn/vm/Y8p34cQ.aspx",
+      "https://v.wjx.cn/vm/eIVtOI2.aspx",
+      "https://www.wjx.cn/vm/wxqMue2.aspx"
+    ];
+
+    const maxPerForm = 10;
+    const counts = [6, 9, 10, 4]; // 示例，可手动更新
+
+    const consentBox = document.getElementById('consentCheckbox');
+    const startButton = document.getElementById('startButton');
+    const message = document.getElementById('message');
+
+    if (localStorage.getItem('hasParticipated')) {
+      document.body.innerHTML = `
+        <div class="container">
+          <h1>您已参与过实验</h1>
+          <p>感谢您的参与，每位参与者只能完成一次实验。</p>
+        </div>
+      `;
+    }
+
+    consentBox.addEventListener('change', () => {
+      startButton.disabled = !consentBox.checked;
+      message.textContent = '';
+    });
+
+    startButton.addEventListener('click', () => {
+      if (!consentBox.checked) {
+        message.textContent = "请先勾选知情同意书以继续。";
+        return;
+      }
+
+      const available = urls.filter((_, i) => counts[i] < maxPerForm);
+      if (available.length === 0) {
+        message.textContent = "所有问卷名额已满，请稍后再试。";
+        return;
+      }
+
+      const randomUrl = available[Math.floor(Math.random() * available.length)];
+      localStorage.setItem('hasParticipated', 'true');
+      window.location.href = randomUrl;
+    });
+  </script>
+</body>
+</html>
